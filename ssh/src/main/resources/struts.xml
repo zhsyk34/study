@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+    <constant name="struts.enable.DynamicMethodInvocation" value="false"/>
+    <constant name="struts.configuration.xml.reload" value="true"/>
+    <constant name="struts.devMode" value="true"/>
+
+    <constant name="struts.i18n.encoding" value="UTF-8"/>
+    <constant name="struts.objectFactory" value="spring"/>
+
+    <!-- 上传文件大小限制设置 -->
+    <constant name="struts.multipart.maxSize" value="-1"/>
+    <!-- 设置上传文件的临时目录 "/"表示项目的硬盘根目录如D: -->
+    <constant name="struts.multipart.saveDir" value="/temp"/>
+
+    <package name="" extends="struts-default" namespace="/">
+        <action name="*_*" class="com.cat.action.{1}Action" method="{2}">
+            <result>/jsp/{1}_{2}.jsp</result>
+        </action>
+    </package>
+
+    <!-- 返回json数据 -->
+    <package name="" extends="json-default" namespace="/json">
+        <global-results>
+            <result name="logon">/jsp/logon.jsp</result>
+            <result name="error">/jsp/error.jsp</result>
+        </global-results>
+
+        <action name="*_*" class="com.cat.action.{1}Action" method="{2}">
+            <result type="json">
+                <param name="root">jsonData</param>
+            </result>
+        </action>
+    </package>
+</struts>

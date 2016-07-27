@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx" xmlns="http://www.springframework.org/schema/beans" xsi:schemaLocation="http://www.springframework.org/schema/beans
+     http://www.springframework.org/schema/beans/spring-beans.xsd
+     http://www.springframework.org/schema/context
+     http://www.springframework.org/schema/context/spring-context.xsd
+     http://www.springframework.org/schema/aop
+     http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+     http://www.springframework.org/schema/tx
+     http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <!-- 扫描spring注解 -->
+    <context:component-scan base-package="com.cat"/>
+    <!-- 读取配置文件 -->
+    <context:property-placeholder location="classpath:/jdbc.properties"/>
+    <!--数据库连接池-->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+    <!--Hibernate工厂-->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 自动扫描注解实体类 -->
+        <property name="packagesToScan" value="com.cat.model"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">${hibernate.dialect}</prop>
+                <prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+                <prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+            </props>
+        </property>
+    </bean>
+    <!--事务管理器-->
+    <bean id="txManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    <!--事物管理规则-->
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <tx:method name="find*" read-only="true"/>
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="merge*" propagation="REQUIRED"/>
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+    <!--事务切入面-->
+    <aop:config>
+        <!--测试用，实际使用应删除dao部分-->
+        <aop:pointcut id="business" expression="execution(* com.cat.service..*.*(..))||execution(* com.cat.dao..*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="business"/>
+    </aop:config>
+    <!--Hibernate模板方法-->
+    <bean id="hibernateTemplate" class="org.springframework.orm.hibernate4.HibernateTemplate">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+</beans>
