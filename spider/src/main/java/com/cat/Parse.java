@@ -1,7 +1,6 @@
-package com.cat.model;
+package com.cat;
 
 import com.cat.tools.ClientRequest;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -12,9 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Archimedes on 2016/7/11.
- */
 public class Parse {
 
     private static final String GETURL = "http://www.xmrc.com.cn/net/info/";
@@ -99,5 +95,9 @@ public class Parse {
             }
         }
         return false;
+    }
+
+    public static void main(String[] args) {
+
     }
 }
